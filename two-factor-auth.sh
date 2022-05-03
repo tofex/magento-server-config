@@ -52,8 +52,8 @@ if [[ ! -f ${currentPath}/../env.properties ]]; then
   exit 1
 fi
 
-servers=$(ini-parse "${currentPath}/../env.properties" "yes" "project" "servers")
-if [[ -z "${servers}" ]]; then
+serverList=( $(ini-parse "${currentPath}/../env.properties" "yes" "system" "server") )
+if [[ "${#serverList[@]}" -eq 0 ]]; then
   echo "No servers specified!"
   exit 1
 fi
@@ -65,22 +65,22 @@ if [[ -z "${magentoVersion}" ]]; then
 fi
 
 if [[ $(versionCompare "${magentoVersion}" "2.4.0") == 0 ]] || [[ $(versionCompare "${magentoVersion}" "2.4.0") == 2 ]]; then
-  IFS=',' read -r -a serverList <<< "${servers}"
-
   for server in "${serverList[@]}"; do
-    type=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "type")
-
-    if [[ "${type}" == "local" ]]; then
-      webPath=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "webPath")
-      echo "--- Configuring two factor auth on server: ${server} ---"
-      cd "${webPath}"
-      if [[ "${enable}" == 1 ]]; then
-        echo "Enabling two factor auth"
-        bin/magento module:enable Magento_TwoFactorAuth
-      fi
-      if [[ "${disable}" == 1 ]]; then
-        echo "Disabling two factor auth"
-        bin/magento module:disable Magento_TwoFactorAuth
+    webServer=$(ini-parse "${currentPath}/../env.properties" "no" "${server}" "webServer")
+    if [[ -n "${webServer}" ]]; then
+      type=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "type")
+      if [[ "${type}" == "local" ]]; then
+        webPath=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "webPath")
+        echo "--- Configuring two factor auth on local server: ${server} ---"
+        cd "${webPath}"
+        if [[ "${enable}" == 1 ]]; then
+          echo "Enabling two factor auth"
+          bin/magento module:enable Magento_TwoFactorAuth
+        fi
+        if [[ "${disable}" == 1 ]]; then
+          echo "Disabling two factor auth"
+          bin/magento module:disable Magento_TwoFactorAuth
+        fi
       fi
     fi
   done
