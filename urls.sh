@@ -89,7 +89,6 @@ if [[ -z "${databaseName}" ]]; then
 fi
 
 magentoVersion=$(ini-parse "${currentPath}/../env.properties" "yes" "install" "magentoVersion")
-
 if [[ -z "${magentoVersion}" ]]; then
   echo "No Magento version specified!"
   exit 1
