@@ -19,6 +19,16 @@ trim()
   echo -n "$1" | xargs
 }
 
+versionCompare() {
+  if [[ "$1" == "$2" ]]; then
+    echo "0"
+  elif [[ "$1" = $(echo -e "$1\n$2" | sort -V | head -n1) ]]; then
+    echo "1"
+  else
+    echo "2"
+  fi
+}
+
 while getopts h? option; do
   case "${option}" in
     h) usage; exit 1;;
@@ -151,6 +161,18 @@ if [[ ${magentoVersion:0:1} == 1 ]]; then
     fi
   done
 else
+  if [[ $(versionCompare "${magentoVersion}" "2.4.0") == 0 ]] || [[ $(versionCompare "${magentoVersion}" "2.4.0") == 2 ]]; then
+    secureBaseMediaUrl="{{secure_base_url}}media/"
+    secureBaseStaticUrl="{{secure_base_url}}static/"
+    unsecureBaseMediaUrl="{{unsecure_base_url}}media/"
+    unsecureBaseStaticUrl="{{unsecure_base_url}}static/"
+  else
+    secureBaseMediaUrl="{{secure_base_url}}pub/media/"
+    secureBaseStaticUrl="{{secure_base_url}}pub/static/"
+    unsecureBaseMediaUrl="{{unsecure_base_url}}pub/media/"
+    unsecureBaseStaticUrl="{{unsecure_base_url}}pub/static/"
+  fi
+
   mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "DELETE FROM core_config_data WHERE path = 'web/secure/base_url';"
   mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "DELETE FROM core_config_data WHERE path = 'web/unsecure/base_url';"
   mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "DELETE FROM core_config_data WHERE path = 'web/secure/base_link_url';"
@@ -165,10 +187,10 @@ else
   mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/unsecure/base_url', 'https://${mainHostName}/');"
   mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/secure/base_link_url', 'https://${mainHostName}/');"
   mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/unsecure/base_link_url', 'https://${mainHostName}/');"
-  mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/secure/base_media_url', '{{secure_base_url}}media/');"
-  mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/unsecure/base_media_url', '{{unsecure_base_url}}media/');"
-  mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/secure/base_static_url', '{{secure_base_url}}static/');"
-  mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/unsecure/base_static_url', '{{unsecure_base_url}}static/');"
+  mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/secure/base_media_url', '${secureBaseMediaUrl}');"
+  mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/unsecure/base_media_url', '${unsecureBaseMediaUrl}');"
+  mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/secure/base_static_url', '${secureBaseStaticUrl}');"
+  mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/unsecure/base_static_url', '${unsecureBaseStaticUrl}');"
   mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/cookie/cookie_domain', 'https://${mainHostName}/');"
   mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/cookie/cookie_path', '/');"
 
@@ -183,20 +205,20 @@ else
       mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'websites', website_id, 'web/unsecure/base_url', 'https://${hostName}/' FROM store_website WHERE code = '${code}'"
       mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'websites', website_id, 'web/secure/base_link_url', 'https://${hostName}/' FROM store_website WHERE code = '${code}'"
       mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'websites', website_id, 'web/unsecure/base_link_url', 'https://${hostName}/' FROM store_website WHERE code = '${code}'"
-      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'websites', website_id, 'web/secure/base_media_url', '{{secure_base_url}}media/' FROM store_website WHERE code = '${code}'"
-      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'websites', website_id, 'web/unsecure/base_media_url', '{{unsecure_base_url}}media/' FROM store_website WHERE code = '${code}'"
-      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'websites', website_id, 'web/secure/base_static_url', '{{secure_base_url}}static/' FROM store_website WHERE code = '${code}'"
-      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'websites', website_id, 'web/unsecure/base_static_url', '{{unsecure_base_url}}static/' FROM store_website WHERE code = '${code}'"
+      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'websites', website_id, 'web/secure/base_media_url', '${secureBaseMediaUrl}' FROM store_website WHERE code = '${code}'"
+      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'websites', website_id, 'web/unsecure/base_media_url', '${unsecureBaseMediaUrl}' FROM store_website WHERE code = '${code}'"
+      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'websites', website_id, 'web/secure/base_static_url', '${secureBaseStaticUrl}' FROM store_website WHERE code = '${code}'"
+      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'websites', website_id, 'web/unsecure/base_static_url', '${unsecureBaseStaticUrl}' FROM store_website WHERE code = '${code}'"
       mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'websites', website_id, 'web/cookie/cookie_domain', 'https://${hostName}/' FROM store_website WHERE code = '${code}'"
     elif [[ "${scope}" == "store" ]]; then
       mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/secure/base_url', 'https://${hostName}/' FROM store WHERE code = '${code}'"
       mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/unsecure/base_url', 'https://${hostName}/' FROM store WHERE code = '${code}'"
       mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/secure/base_link_url', 'https://${hostName}/' FROM store WHERE code = '${code}'"
       mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/unsecure/base_link_url', 'https://${hostName}/' FROM store WHERE code = '${code}'"
-      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/secure/base_media_url', '{{secure_base_url}}media/' FROM store WHERE code = '${code}'"
-      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/unsecure/base_media_url', '{{unsecure_base_url}}media/' FROM store WHERE code = '${code}'"
-      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/secure/base_static_url', '{{secure_base_url}}static/' FROM store WHERE code = '${code}'"
-      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/unsecure/base_static_url', '{{unsecure_base_url}}static/' FROM store WHERE code = '${code}'"
+      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/secure/base_media_url', '${secureBaseMediaUrl}' FROM store WHERE code = '${code}'"
+      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/unsecure/base_media_url', '${unsecureBaseMediaUrl}' FROM store WHERE code = '${code}'"
+      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/secure/base_static_url', '${secureBaseStaticUrl}' FROM store WHERE code = '${code}'"
+      mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/unsecure/base_static_url', '${unsecureBaseStaticUrl}' FROM store WHERE code = '${code}'"
       mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) SELECT 'stores', store_id, 'web/cookie/cookie_domain', 'https://${hostName}/' FROM store WHERE code = '${code}'"
     fi
   done
