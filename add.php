@@ -52,7 +52,7 @@ function addDeepValue(array $useArray, array $useKeys, $useValue): array
  *
  * @return string|null
  */
-function varExport($variable, string $indent = ""): ?string
+function varExport($variable, string $indent = ""): string
 {
     switch (gettype($variable)) {
         case 'string':
