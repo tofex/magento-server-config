@@ -19,6 +19,50 @@ trim()
   echo -n "$1" | xargs
 }
 
+copyFileToSSH()
+{
+  sshUser="${1}"
+  sshHost="${2}"
+  filePath="${3}"
+
+  fileName=$(basename "${filePath}")
+  remoteFileName="/tmp/${fileName}"
+
+  echo "Copying file from: ${filePath} to: ${sshUser}@${sshHost}:${remoteFileName}"
+  scp -q "${filePath}" "${sshUser}@${sshHost}:${remoteFileName}"
+}
+
+executeScriptWithSSH()
+{
+  sshUser="${1}"
+  shift
+  sshHost="${1}"
+  shift
+  filePath="${1}"
+  shift
+  parameters=("$@")
+
+  copyFileToSSH "${sshUser}" "${sshHost}" "${filePath}"
+
+  fileName=$(basename "${filePath}")
+  remoteFileName="/tmp/${fileName}"
+
+  echo "Executing script at: ${sshUser}@${sshHost}:${remoteFileName}"
+  ssh "${sshUser}@${sshHost}" "${remoteFileName}" "${parameters[@]}"
+
+  removeFileFromSSH "${sshUser}" "${sshHost}" "${remoteFileName}"
+}
+
+removeFileFromSSH()
+{
+  sshUser="${1}"
+  sshHost="${2}"
+  filePath="${3}"
+
+  echo "Removing file from: ${sshUser}@${sshHost}:${filePath}"
+  ssh "${sshUser}@${sshHost}" "rm -rf ${filePath}"
+}
+
 while getopts h? option; do
   case "${option}" in
     h) usage; exit 1;;
@@ -44,37 +88,32 @@ fi
 for server in "${serverList[@]}"; do
   webServer=$(ini-parse "${currentPath}/../env.properties" "no" "${server}" "webServer")
   if [[ -n "${webServer}" ]]; then
-
     type=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "type")
-    if [[ "${type}" == "local" ]]; then
-      webUser=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "webUser")
-      webGroup=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "webGroup")
-      webPath=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "webPath")
-      currentUser="$(whoami)"
-      if [[ -z "${webUser}" ]]; then
-        webUser="${currentUser}"
-      fi
-      currentGroup="$(id -g -n)"
-      if [[ -z "${webGroup}" ]]; then
-        webGroup="${currentGroup}"
-      fi
-      echo "--- Merging on local server: ${server} ---"
+    webUser=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "webUser")
+    webGroup=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "webGroup")
+    webPath=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "webPath")
 
-      magento1ConfigFile="${webPath}/app/etc/local.xml"
-      if [[ -e "${magento1ConfigFile}" ]]; then
-        if [[ -L "${magento1ConfigFile}" ]]; then
-          magento1ConfigFile=$(readlink -f "${magento1ConfigFile}")
-        fi
-        if [[ -f "${magento1ConfigFile}" ]]; then
-          magento1ConfigPath=$(dirname "${magento1ConfigFile}")
-          echo "Merging configuration in path: ${magento1ConfigPath}"
-          if [[ "${webUser}" != "${currentUser}" ]] || [[ "${webGroup}" != "${currentGroup}" ]]; then
-            sudo -H -u "${webUser}" bash -c "php ${currentPath}/merge.php \"${magento1ConfigPath}\""
-          else
-            php "${currentPath}/merge.php" "${magento1ConfigPath}"
-          fi
-        fi
-      fi
+    if [[ "${type}" == "local" ]]; then
+      echo "--- Merging on local server: ${server} ---"
+      "${currentPath}/merge-local.sh" \
+        -w "${webPath}" \
+        -u "${webUser}" \
+        -g "${webGroup}" \
+        -m "${currentPath}/merge.php"
+    elif [[ "${type}" == "ssh" ]]; then
+      echo "--- Merging on remote server: ${server} ---"
+      sshUser=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "user")
+      sshHost=$(ini-parse "${currentPath}/../env.properties" "yes" "${server}" "host")
+
+      copyFileToSSH "${sshUser}" "${sshHost}" "${currentPath}/merge.php"
+
+      executeScriptWithSSH "${sshUser}" "${sshHost}" "${currentPath}/merge-local.sh" \
+        -w "${webPath}" \
+        -u "${webUser}" \
+        -g "${webGroup}" \
+        -m "/tmp/merge.php"
+
+      removeFileFromSSH "${sshUser}" "${sshHost}" /tmp/merge.php
     fi
   fi
 done
