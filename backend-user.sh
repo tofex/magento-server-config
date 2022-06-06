@@ -11,7 +11,7 @@ OPTIONS:
   -h  Show this message
   -u  User name, default: dev-admin
   -p  User password, default: dev-admin12345
-  -e  E-Mail address
+  -e  E-Mail address, default <user_name>@localhost.local
   -f  Hash function, default: md5
   -l  Hash length (required for sha2)
 
@@ -26,7 +26,7 @@ trim()
 
 userName="dev-admin"
 userPassword="dev-admin12345"
-userMail=""
+userMail=
 hash=
 hashLength=
 
@@ -73,22 +73,14 @@ if [[ ! -f "${currentPath}/../env.properties" ]]; then
   exit 1
 fi
 
-magentoVersion=$(ini-parse "${currentPath}/../env.properties" "yes" "install" "magentoVersion")
-if [[ -z "${magentoVersion}" ]]; then
-  echo "No Magento version specified!"
-  exit 1
-fi
-
-"${currentPath}/../core/script/database-single.sh" "${currentPath}/backend-user-local-db.sh" \
-  -v "${magentoVersion}" \
+"${currentPath}/../core/script/magento/database.sh" "${currentPath}/backend-user/database.sh" \
   -n "${userName}" \
   -w "${userPassword}" \
-  -e "${userMail}" \
+  -a "${userMail}" \
   -f "${hash}" \
   -l "${hashLength}"
 
-"${currentPath}/../core/script/web-server-single.sh" "${currentPath}/backend-user-local-web.sh" \
-  -v "${magentoVersion}" \
-  -u "${userName}" \
-  -p "${userPassword}" \
-  -e "${userMail}"
+"${currentPath}/../core/script/magento/web-server.sh" "${currentPath}/backend-user/web-server.sh" \
+  -n "${userName}" \
+  -w "${userPassword}" \
+  -a "${userMail}"

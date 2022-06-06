@@ -29,12 +29,18 @@ webUser=
 webGroup=
 mergeScript=
 
-while getopts hw:u:g:m:? option; do
+while getopts hw:u:g:t:v:p:z:x:y:m:? option; do
   case "${option}" in
     h) usage; exit 1;;
     w) webPath=$(trim "$OPTARG");;
     u) webUser=$(trim "$OPTARG");;
     g) webGroup=$(trim "$OPTARG");;
+    t) ;;
+    v) ;;
+    p) ;;
+    z) ;;
+    x) ;;
+    y) ;;
     m) mergeScript=$(trim "$OPTARG");;
     ?) usage; exit 1;;
   esac

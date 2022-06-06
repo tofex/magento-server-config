@@ -9,15 +9,15 @@ usage: ${scriptName} options
 
 OPTIONS:
   -h  Show this message
-  -a  Admin path, default: admin
-  -v  Magento version
+  -m  Magento version
   -o  Database host, default: localhost
   -p  Database port, default: 3306
   -u  Name of the database user
   -s  Password of the database user
   -b  Name of the database
+  -a  Admin path, default: admin
 
-Example: ${scriptName} -a custompath -v 2.3.7 -u magento -p magento -b magento
+Example: ${scriptName} -m 2.3.7 -u magento -p magento -b magento -a custompath
 EOF
 }
 
@@ -26,31 +26,32 @@ trim()
   echo -n "$1" | xargs
 }
 
-adminPath=
 magentoVersion=
 databaseHost=
 databasePort=
 databaseUser=
 databasePassword=
 databaseName=
+adminPath=
 
-while getopts ha:v:o:p:u:s:b:? option; do
+while getopts hm:e:d:r:o:p:u:s:b:t:v:a:? option; do
   case "${option}" in
     h) usage; exit 1;;
-    a) adminPath=$(trim "$OPTARG");;
-    v) magentoVersion=$(trim "$OPTARG");;
+    m) magentoVersion=$(trim "$OPTARG");;
+    e) ;;
+    d) ;;
+    r) ;;
     o) databaseHost=$(trim "$OPTARG");;
     p) databasePort=$(trim "$OPTARG");;
     u) databaseUser=$(trim "$OPTARG");;
     s) databasePassword=$(trim "$OPTARG");;
     b) databaseName=$(trim "$OPTARG");;
+    t) ;;
+    v) ;;
+    a) adminPath=$(trim "$OPTARG");;
     ?) usage; exit 1;;
   esac
 done
-
-if [[ -z "${adminPath}" ]]; then
-  adminPath="admin"
-fi
 
 if [[ -z "${magentoVersion}" ]]; then
   echo "No Magento version specified!"
@@ -82,6 +83,10 @@ if [[ -z "${databaseName}" ]]; then
   echo "No database name specified!"
   usage
   exit 1
+fi
+
+if [[ -z "${adminPath}" ]]; then
+  adminPath="admin"
 fi
 
 export MYSQL_PWD="${databasePassword}"

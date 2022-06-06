@@ -9,16 +9,16 @@ usage: ${scriptName} options
 
 OPTIONS:
   -h  Show this message
+  -m  Magento version
   -w  Web path
-  -a  Admin path, default: admin
   -u  Web user
   -g  Web group
-  -v  Magento version
-  -m  Merge script (required if Magento 1)
+  -a  Admin path, default: admin
+  -s  Merge script (required if Magento 1)
   -c  Merge script PHP script (required if Magento 1)
   -d  Add PHP script (required if Magento 2)
 
-Example: ${scriptName} -w /var/www/magento/htdocs -a customadmin -v 2.3.7 -d /tmp/add.php
+Example: ${scriptName} -m 2.3.7 -w /var/www/magento/htdocs -a customadmin -i /tmp/script.php
 EOF
 }
 
@@ -27,29 +27,44 @@ trim()
   echo -n "$1" | xargs
 }
 
+magentoVersion=
 webPath=
-adminPath=
 webUser=
 webGroup=
-magentoVersion=
+adminPath=
 mergeScript=
 mergeScriptPhpScript=
 addScript=
 
-while getopts hw:a:u:g:v:m:c:d:? option; do
+while getopts hm:e:d:r:w:u:g:t:v:p:z:x:y:a:s:c:d:? option; do
   case "${option}" in
     h) usage; exit 1;;
+    m) magentoVersion=$(trim "$OPTARG");;
+    e) ;;
+    d) ;;
+    r) ;;
     w) webPath=$(trim "$OPTARG");;
-    a) adminPath=$(trim "$OPTARG");;
     u) webUser=$(trim "$OPTARG");;
     g) webGroup=$(trim "$OPTARG");;
-    v) magentoVersion=$(trim "$OPTARG");;
-    m) mergeScript=$(trim "$OPTARG");;
+    t) ;;
+    v) ;;
+    p) ;;
+    z) ;;
+    x) ;;
+    y) ;;
+    a) adminPath=$(trim "$OPTARG");;
+    s) mergeScript=$(trim "$OPTARG");;
     c) mergeScriptPhpScript=$(trim "$OPTARG");;
-    d) addScript=$(trim "$OPTARG");;
+    i) addScript=$(trim "$OPTARG");;
     ?) usage; exit 1;;
   esac
 done
+
+if [[ -z "${magentoVersion}" ]]; then
+  echo "No Magento version specified!"
+  usage
+  exit 1
+fi
 
 if [[ -z "${webPath}" ]]; then
   echo "No web path specified!"
@@ -57,14 +72,26 @@ if [[ -z "${webPath}" ]]; then
   exit 1
 fi
 
+currentUser="$(whoami)"
+if [[ -z "${webUser}" ]]; then
+  webUser="${currentUser}"
+fi
+
+currentGroup="$(id -g -n)"
+if [[ -z "${webGroup}" ]]; then
+  webGroup="${currentGroup}"
+fi
+
 if [[ -z "${adminPath}" ]]; then
   adminPath="admin"
 fi
 
-if [[ -z "${magentoVersion}" ]]; then
-  echo "No Magento version specified!"
-  usage
-  exit 1
+if [[ -z "${adminPath}" ]]; then
+  adminPath="admin"
+fi
+
+if [[ -z "${adminPath}" ]]; then
+  adminPath="admin"
 fi
 
 if [[ ${magentoVersion:0:1} == 1 ]]; then
@@ -83,15 +110,16 @@ if [[ ${magentoVersion:0:1} == 1 ]]; then
 
   magento1ConfigFile="${webPath}/app/etc/local.xml"
 
-  if [[ -L "${magento1ConfigFile}" ]]; then
-    magento1ConfigFile=$(readlink -f "${magento1ConfigFile}")
-  fi
+  if [[ -e "${magento1ConfigFile}" ]]; then
+    if [[ -L "${magento1ConfigFile}" ]]; then
+      magento1ConfigFile=$(readlink -f "${magento1ConfigFile}")
+    fi
 
-  if [[ -f "${magento1ConfigFile}" ]]; then
-    magento1ConfigPath=$(dirname "${magento1ConfigFile}")
-    configFile="${magento1ConfigPath}/local.admin.xml"
-    echo "Creating configuration file: ${configFile}"
-    cat <<EOF | tee "${configFile}" > /dev/null
+    if [[ -f "${magento1ConfigFile}" ]]; then
+      magento1ConfigPath=$(dirname "${magento1ConfigFile}")
+      configFile="${magento1ConfigPath}/local.admin.xml"
+      echo "Creating configuration file: ${configFile}"
+      cat <<EOF | tee "${configFile}" > /dev/null
 <?xml version="1.0"?>
 <config>
     <admin>
@@ -105,13 +133,14 @@ if [[ ${magentoVersion:0:1} == 1 ]]; then
     </admin>
 </config>
 EOF
-  fi
 
-  "${mergeScript}" \
-    -w "${webPath}" \
-    -u "${webUser}" \
-    -g "${webGroup}" \
-    -m "${mergeScriptPhpScript}"
+      "${mergeScript}" \
+        -w "${webPath}" \
+        -u "${webUser}" \
+        -g "${webGroup}" \
+        -m "${mergeScriptPhpScript}"
+    fi
+  fi
 elif [[ ${magentoVersion:0:1} == 2 ]]; then
   # Magento 2
   if [[ -z "${addScript}" ]]; then
