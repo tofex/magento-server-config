@@ -15,10 +15,10 @@ OPTIONS:
   -g  Web group
   -a  Admin path, default: admin
   -s  Merge script (required if Magento 1)
-  -c  Merge script PHP script (required if Magento 1)
-  -i  Add PHP script (required if Magento 2)
+  -i  Merge script PHP script (required if Magento 1)
+  -j  Add PHP script (required if Magento 2)
 
-Example: ${scriptName} -m 2.3.7 -w /var/www/magento/htdocs -a customadmin -i /tmp/script.php
+Example: ${scriptName} -m 2.3.7 -w /var/www/magento/htdocs -a customadmin -j /tmp/script.php
 EOF
 }
 
@@ -36,13 +36,15 @@ mergeScript=
 mergeScriptPhpScript=
 addScript=
 
-while getopts hm:e:d:r:w:u:g:t:v:p:z:x:y:a:s:c:i:? option; do
+while getopts hm:e:d:r:c:n:w:u:g:t:v:p:z:x:y:a:s:i:j:? option; do
   case "${option}" in
     h) usage; exit 1;;
     m) magentoVersion=$(trim "$OPTARG");;
     e) ;;
     d) ;;
     r) ;;
+    c) ;;
+    n) ;;
     w) webPath=$(trim "$OPTARG");;
     u) webUser=$(trim "$OPTARG");;
     g) webGroup=$(trim "$OPTARG");;
@@ -54,8 +56,8 @@ while getopts hm:e:d:r:w:u:g:t:v:p:z:x:y:a:s:c:i:? option; do
     y) ;;
     a) adminPath=$(trim "$OPTARG");;
     s) mergeScript=$(trim "$OPTARG");;
-    c) mergeScriptPhpScript=$(trim "$OPTARG");;
-    i) addScript=$(trim "$OPTARG");;
+    i) mergeScriptPhpScript=$(trim "$OPTARG");;
+    j) addScript=$(trim "$OPTARG");;
     ?) usage; exit 1;;
   esac
 done

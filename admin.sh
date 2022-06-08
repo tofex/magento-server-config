@@ -48,8 +48,5 @@ fi
 "${currentPath}/../core/script/magento/database.sh" "${currentPath}/admin/database.sh" \
   -a "${adminPath}"
 
-"${currentPath}/../core/script/magento/web-server.sh" "${currentPath}/admin/web-server.sh" \
-  -a "${adminPath}" \
-  -s "script:${currentPath}/merge/web-server.sh" \
-  -c "script:${currentPath}/merge.php" \
-  -i "script:${currentPath}/add.php"
+"${currentPath}/../core/script/magento/web-server/config.sh" "${currentPath}/admin/web-server.sh" \
+  -a "${adminPath}"

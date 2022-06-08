@@ -11,11 +11,11 @@ OPTIONS:
   -h  Show this message
   -m  Magento version
   -w  Web path
-  -n  User name, default: dev-admin
+  -a  User name, default: dev-admin
   -s  User password, default: dev-admin12345
-  -a  E-Mail address, default: <userName>@localhost.local
+  -i  E-Mail address, default: <userName>@localhost.local
 
-Example: ${scriptName} -m 2.3.7 -w /var/www/magento/htdocs -n username -s password -a no@one.com
+Example: ${scriptName} -m 2.3.7 -w /var/www/magento/htdocs -a username -s password -i no@one.com
 EOF
 }
 
@@ -30,13 +30,15 @@ userName=
 userPassword=
 userMail=
 
-while getopts hm:e:d:r:w:u:g:t:v:p:z:x:y:n:s:a:? option; do
+while getopts hm:e:d:r:c:n:w:u:g:t:v:p:z:x:y:a:s:i:? option; do
   case "${option}" in
     h) usage; exit 1;;
     m) magentoVersion=$(trim "$OPTARG");;
     e) ;;
     d) ;;
     r) ;;
+    c) ;;
+    n) ;;
     w) webPath=$(trim "$OPTARG");;
     u) ;;
     g) ;;
@@ -46,9 +48,9 @@ while getopts hm:e:d:r:w:u:g:t:v:p:z:x:y:n:s:a:? option; do
     z) ;;
     x) ;;
     y) ;;
-    n) userName=$(trim "$OPTARG");;
+    a) userName=$(trim "$OPTARG");;
     s) userPassword=$(trim "$OPTARG");;
-    a) userMail=$(trim "$OPTARG");;
+    i) userMail=$(trim "$OPTARG");;
     ?) usage; exit 1;;
   esac
 done

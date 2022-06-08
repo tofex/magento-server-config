@@ -16,13 +16,13 @@ OPTIONS:
   -u  Name of the database user
   -s  Password of the database user
   -b  Name of the database
-  -n  User name, default: dev-admin
+  -a  User name, default: dev-admin
   -w  User password, default: dev-admin12345
-  -a  E-Mail address
+  -i  E-Mail address
   -f  Hash function, default: md5
   -l  Hash length (required for sha2)
 
-Example: ${scriptName} -m 2.3.7 -u magento -p magento -b magento -n username -w password -a no@one.com
+Example: ${scriptName} -m 2.3.7 -u magento -p magento -b magento -a username -w password -i no@one.com
 EOF
 }
 
@@ -43,7 +43,7 @@ userMail=
 hash=
 hashLength=
 
-while getopts hm:e:d:r:c:o:p:u:s:b:t:v:n:w:a:f:l:? option; do
+while getopts hm:e:d:r:c:o:p:u:s:b:t:v:a:w:i:f:l:? option; do
   case "${option}" in
     h) usage; exit 1;;
     m) magentoVersion=$(trim "$OPTARG");;
@@ -58,9 +58,9 @@ while getopts hm:e:d:r:c:o:p:u:s:b:t:v:n:w:a:f:l:? option; do
     b) databaseName=$(trim "$OPTARG");;
     t) ;;
     v) ;;
-    n) userName=$(trim "$OPTARG");;
+    a) userName=$(trim "$OPTARG");;
     w) userPassword=$(trim "$OPTARG");;
-    a) userMail=$(trim "$OPTARG");;
+    i) userMail=$(trim "$OPTARG");;
     f) hash=$(trim "$OPTARG");;
     l) hashLength=$(trim "$OPTARG");;
     ?) usage; exit 1;;

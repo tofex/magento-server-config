@@ -72,13 +72,13 @@ if [[ ! -f "${currentPath}/../env.properties" ]]; then
 fi
 
 "${currentPath}/../core/script/magento/database.sh" "${currentPath}/backend-user/database.sh" \
-  -n "${userName}" \
+  -a "${userName}" \
   -w "${userPassword}" \
-  -a "${userMail}" \
+  -i "${userMail}" \
   -f "${hash}" \
   -l "${hashLength}"
 
 "${currentPath}/../core/script/magento/web-server.sh" "${currentPath}/backend-user/web-server.sh" \
-  -n "${userName}" \
+  -a "${userName}" \
   -s "${userPassword}" \
-  -a "${userMail}"
+  -i "${userMail}"

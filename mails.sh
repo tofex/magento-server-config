@@ -43,8 +43,5 @@ if [[ -z "${mailAddress}" ]]; then
 fi
 
 "${currentPath}/../core/script/database/single.sh" "${currentPath}/mails/database.sh"
-"${currentPath}/../core/script/magento/web-server.sh" "${currentPath}/mails/web-server.sh" \
-  -a "${mailAddress}" \
-  -s "script:${currentPath}/merge/web-server.sh" \
-  -c "script:${currentPath}/merge.php" \
-  -i "script:${currentPath}/add.php"
+"${currentPath}/../core/script/magento/web-server/config.sh" "${currentPath}/mails/web-server.sh" \
+  -a "${mailAddress}"

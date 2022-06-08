@@ -5,6 +5,7 @@ scriptName="${0##*/}"
 usage()
 {
 cat >&2 << EOF
+
 usage: ${scriptName} options
 
 OPTIONS:
@@ -12,8 +13,11 @@ OPTIONS:
   -m  Magento version
   -w  Web path
   -a  Mail address, default: webmaster@localhost.local
+  -s  Merge script (required if Magento 1)
+  -i  Merge script PHP script (required if Magento 1)
+  -j  Add PHP script (required if Magento 2)
 
-Example: ${scriptName} -m 2.3.7 -w /var/www/magento/htdocs -a webmaster@localhost.local
+Example: ${scriptName} -m 2.3.7 -w /var/www/magento/htdocs -a webmaster@localhost.local -j /tmp/script.php
 EOF
 }
 
@@ -31,13 +35,15 @@ mergeScript=
 mergeScriptPhpScript=
 addScript=
 
-while getopts hm:e:d:r:w:u:g:t:v:p:z:x:y:a:s:c:i:? option; do
+while getopts hm:e:d:r:c:n:w:u:g:t:v:p:z:x:y:a:s:i:j:? option; do
   case "${option}" in
     h) usage; exit 1;;
     m) magentoVersion=$(trim "$OPTARG");;
     e) ;;
     d) ;;
     r) ;;
+    c) ;;
+    n) ;;
     w) webPath=$(trim "$OPTARG");;
     u) webUser=$(trim "$OPTARG");;
     g) webGroup=$(trim "$OPTARG");;
@@ -49,8 +55,8 @@ while getopts hm:e:d:r:w:u:g:t:v:p:z:x:y:a:s:c:i:? option; do
     y) ;;
     a) mailAddress=$(trim "$OPTARG");;
     s) mergeScript=$(trim "$OPTARG");;
-    c) mergeScriptPhpScript=$(trim "$OPTARG");;
-    i) addScript=$(trim "$OPTARG");;
+    i) mergeScriptPhpScript=$(trim "$OPTARG");;
+    j) addScript=$(trim "$OPTARG");;
     ?) usage; exit 1;;
   esac
 done
