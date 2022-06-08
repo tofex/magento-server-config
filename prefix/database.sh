@@ -14,8 +14,9 @@ OPTIONS:
   -u  Name of the database user
   -s  Password of the database user
   -b  Name of the database
+  -r  Prefix to use
 
-Example: ${scriptName} -u magento -p magento -b magento
+Example: ${scriptName} -u magento -p magento -b magento -r 12345
 EOF
 }
 
@@ -31,7 +32,7 @@ databasePassword=
 databaseName=
 prefix=
 
-while getopts ho:p:u:s:b:t:v:? option; do
+while getopts ho:p:u:s:b:t:v:r:? option; do
   case "${option}" in
     h) usage; exit 1;;
     o) databaseHost=$(trim "$OPTARG");;
@@ -41,6 +42,7 @@ while getopts ho:p:u:s:b:t:v:? option; do
     b) databaseName=$(trim "$OPTARG");;
     t) ;;
     v) ;;
+    r) prefix=$(trim "$OPTARG");;
     ?) usage; exit 1;;
   esac
 done
@@ -67,6 +69,12 @@ fi
 
 if [[ -z "${databaseName}" ]]; then
   echo "No database name specified!"
+  usage
+  exit 1
+fi
+
+if [[ -z "${prefix}" ]]; then
+  echo "No prefix specified!"
   usage
   exit 1
 fi

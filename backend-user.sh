@@ -24,8 +24,8 @@ trim()
   echo -n "$1" | xargs
 }
 
-userName="dev-admin"
-userPassword="dev-admin12345"
+userName=
+userPassword=
 userMail=
 hash=
 hashLength=
@@ -43,13 +43,11 @@ while getopts hu:p:e:f:l:? option; do
 done
 
 if [[ -z "${userName}" ]]; then
-  echo "No user name specified!"
-  exit 1
+  userName="dev-admin"
 fi
 
 if [[ -z "${userPassword}" ]]; then
-  echo "No user password specified!"
-  exit 1
+  userPassword="dev-admin12345"
 fi
 
 if [[ -z "${userMail}" ]]; then
@@ -82,5 +80,5 @@ fi
 
 "${currentPath}/../core/script/magento/web-server.sh" "${currentPath}/backend-user/web-server.sh" \
   -n "${userName}" \
-  -w "${userPassword}" \
+  -s "${userPassword}" \
   -a "${userMail}"

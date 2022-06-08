@@ -16,7 +16,7 @@ OPTIONS:
   -a  Admin path, default: admin
   -s  Merge script (required if Magento 1)
   -c  Merge script PHP script (required if Magento 1)
-  -d  Add PHP script (required if Magento 2)
+  -i  Add PHP script (required if Magento 2)
 
 Example: ${scriptName} -m 2.3.7 -w /var/www/magento/htdocs -a customadmin -i /tmp/script.php
 EOF
@@ -36,7 +36,7 @@ mergeScript=
 mergeScriptPhpScript=
 addScript=
 
-while getopts hm:e:d:r:w:u:g:t:v:p:z:x:y:a:s:c:d:? option; do
+while getopts hm:e:d:r:w:u:g:t:v:p:z:x:y:a:s:c:i:? option; do
   case "${option}" in
     h) usage; exit 1;;
     m) magentoVersion=$(trim "$OPTARG");;

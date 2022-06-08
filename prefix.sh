@@ -36,6 +36,5 @@ fi
 randomPrefix=$(cat /dev/urandom | tr -cd 'a-f0-9' | head -c 7)
 echo "Adding random prefix: ${randomPrefix} to all entity increment ids"
 
-"${currentPath}/../core/script/database/single.sh" "${currentPath}/mails/database.sh" \
+"${currentPath}/../core/script/database/single.sh" "${currentPath}/prefix/database.sh" \
   -r "${randomPrefix}"
-

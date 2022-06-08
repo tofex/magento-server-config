@@ -34,13 +34,14 @@ databasePassword=
 databaseName=
 adminPath=
 
-while getopts hm:e:d:r:o:p:u:s:b:t:v:a:? option; do
+while getopts hm:e:d:r:c:o:p:u:s:b:t:v:a:? option; do
   case "${option}" in
     h) usage; exit 1;;
     m) magentoVersion=$(trim "$OPTARG");;
     e) ;;
     d) ;;
     r) ;;
+    c) ;;
     o) databaseHost=$(trim "$OPTARG");;
     p) databasePort=$(trim "$OPTARG");;
     u) databaseUser=$(trim "$OPTARG");;
