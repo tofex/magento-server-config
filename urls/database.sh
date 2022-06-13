@@ -122,7 +122,7 @@ if [[ ${magentoVersion:0:1} == 1 ]]; then
   mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/secure/base_url', 'https://${mainHostName}/');"
   mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "INSERT INTO core_config_data (scope, scope_id, path, value) VALUES ('default', 0, 'web/unsecure/base_url', 'https://${mainHostName}/');"
 else
-  if [[ $(versionCompare "${magentoVersion}" "2.4.0") == 0 ]] || [[ $(versionCompare "${magentoVersion}" "2.4.0") == 2 ]]; then
+  if [[ $(versionCompare "${magentoVersion}" "2.2.0") == 0 ]] || [[ $(versionCompare "${magentoVersion}" "2.2.0") == 2 ]]; then
     secureBaseMediaUrl="{{secure_base_url}}media/"
     secureBaseStaticUrl="{{secure_base_url}}static/"
     unsecureBaseMediaUrl="{{unsecure_base_url}}media/"
