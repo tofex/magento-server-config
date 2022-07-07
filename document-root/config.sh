@@ -1,23 +1,24 @@
 #!/bin/bash -e
 
+currentPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 scriptName="${0##*/}"
 
 usage()
 {
 cat >&2 << EOF
+
 usage: ${scriptName} options
 
 OPTIONS:
-  -h  Show this message
-  -m  Magento version
-  -w  Web path
-  -u  Web user
-  -g  Web group
-  -s  Merge script (required if Magento 1)
-  -i  Merge script PHP script (required if Magento 1)
-  -j  Add PHP script (required if Magento 2)
+  --help            Show this message
+  --magentoVersion  Magento version
+  --webPath         Web path
+  --webUser         Web user
+  --webGroup        Web group
+  --addScript       Add PHP script (required if Magento 2)
 
-Example: ${scriptName} -m 2.3.7 -w /var/www/magento/htdocs -j /tmp/script.php
+Example: ${scriptName} --magentoVersion 2.3.7 --webPath /var/www/magento/htdocs --addScript /tmp/script.php
 EOF
 }
 
@@ -40,35 +41,13 @@ magentoVersion=
 webPath=
 webUser=
 webGroup=
-adminPath=
-mergeScript=
-mergeScriptPhpScript=
 addScript=
 
-while getopts hm:e:d:r:c:n:w:u:g:t:v:p:z:x:y:s:i:j:? option; do
-  case "${option}" in
-    h) usage; exit 1;;
-    m) magentoVersion=$(trim "$OPTARG");;
-    e) ;;
-    d) ;;
-    r) ;;
-    c) ;;
-    n) ;;
-    w) webPath=$(trim "$OPTARG");;
-    u) webUser=$(trim "$OPTARG");;
-    g) webGroup=$(trim "$OPTARG");;
-    t) ;;
-    v) ;;
-    p) ;;
-    z) ;;
-    x) ;;
-    y) ;;
-    s) mergeScript=$(trim "$OPTARG");;
-    i) mergeScriptPhpScript=$(trim "$OPTARG");;
-    j) addScript=$(trim "$OPTARG");;
-    ?) usage; exit 1;;
-  esac
-done
+if [[ -f "${currentPath}/../../core/prepare-parameters.sh" ]]; then
+  source "${currentPath}/../../core/prepare-parameters.sh"
+elif [[ -f /tmp/prepare-parameters.sh ]]; then
+  source /tmp/prepare-parameters.sh
+fi
 
 if [[ -z "${magentoVersion}" ]]; then
   echo "No Magento version specified!"
@@ -90,16 +69,6 @@ fi
 currentGroup="$(id -g -n)"
 if [[ -z "${webGroup}" ]]; then
   webGroup="${currentGroup}"
-fi
-
-if [[ -z "${magentoVersion}" ]]; then
-  echo "No Magento version specified!"
-  exit 1
-fi
-
-if [[ -z "${webPath}" ]]; then
-  echo "No web path specified!"
-  exit 1
 fi
 
 if [[ ${magentoVersion:0:1} == 1 ]]; then
