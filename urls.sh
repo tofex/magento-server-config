@@ -1,41 +1,9 @@
 #!/bin/bash -e
 
-scriptName="${0##*/}"
-
-usage()
-{
-cat >&2 << EOF
-usage: ${scriptName} options
-
-OPTIONS:
-  -h  Show this message
-
-Example: ${scriptName}
-EOF
-}
-
-trim()
-{
-  echo -n "$1" | xargs
-}
-
-while getopts h? option; do
-  case "${option}" in
-    h) usage; exit 1;;
-    ?) usage; exit 1;;
-  esac
-done
-
 currentPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-if [[ ! -f "${currentPath}/../env.properties" ]]; then
-  echo "No environment specified!"
-  exit 1
-fi
 
 mainHostName=$("${currentPath}/../core/server/host/single.sh")
 
-"${currentPath}/../core/script/magento/database.sh" "${currentPath}/urls/database.sh" \
-  -a "${mainHostName}"
-
-"${currentPath}/../core/script/magento/database/hosts.sh" "${currentPath}/urls/database-host.sh"
+"${currentPath}/../core/script/run.sh" "install,database" "${currentPath}/urls/database.sh" \
+  --mainHostName "${mainHostName}"
+"${currentPath}/../core/script/run.sh" "install,host:all,database" "${currentPath}/urls/database-host.sh"
