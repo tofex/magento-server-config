@@ -193,7 +193,4 @@ return [
 ];
 EOF
   fi
-
-  "${currentPath}/../ops/create-shared.sh" -f app/etc/env.php -o
-  "${currentPath}/../ops/create-shared.sh" -f app/etc/config.php -o
 fi
