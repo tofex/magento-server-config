@@ -115,8 +115,9 @@ if [[ -z "${hash}" ]]; then
   hash="md5"
 fi
 
+export MYSQL_PWD="${databasePassword}"
+
 if [[ ${magentoVersion:0:1} == 1 ]]; then
-  export MYSQL_PWD="${databasePassword}"
   adminColumns=( $(mysql -B -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" --disable-column-names -e "select column_name from information_schema.columns where table_schema = \"${databaseName}\" and table_name=\"admin_user\" and column_name in (\"country_id\", \"customer_anonymous_id\", \"tax\");") )
   if [[ "${#adminColumns[@]}" -eq 3 ]]; then
     mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "REPLACE INTO admin_user (firstname, lastname, email, username, password, country_id, customer_anonymous_id, tax) VALUES ('Ad', 'Min', '${userMail}', '${userName}', CONCAT(${hash}('dB${userPassword}'), ':dB'), '', 0, 0);"
@@ -129,5 +130,5 @@ if [[ ${magentoVersion:0:1} == 1 ]]; then
   fi
   mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "REPLACE INTO admin_role (parent_id, tree_level, role_type, user_id, role_name) VALUES (1, 2, 'U', (SELECT user_id FROM admin_user WHERE username = '${userName}'), 'Admins' );"
 elif [[ ${magentoVersion:0:1} == 2 ]]; then
-  echo "No database action required for Magento ${magentoVersion}"
+  mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "DELETE FROM admin_user WHERE username = '${userName}';"
 fi
