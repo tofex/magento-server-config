@@ -114,6 +114,12 @@ if ($firstKey === 'system') {
     $configuration = readToVariable($magento2EnvironmentFile);
 }
 
+if ($value === 'true') {
+    $value = true;
+} else if ($value === 'false') {
+    $value = false;
+}
+
 echo "Adding key: $key\n";
 $configuration = addDeepValue($configuration, explode('/', $key), $value);
 
