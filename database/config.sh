@@ -179,16 +179,16 @@ elif [[ ${magentoVersion:0:1} == 2 ]]; then
         sudo -H -u "${webUser}" bash -c "php ${currentPath}/add.php \"${magento2ConfigPath}\" \"db/connection/default/active\" \"1\""
         sudo -H -u "${webUser}" bash -c "php ${currentPath}/add.php \"${magento2ConfigPath}\" \"resource/default_setup/connection\" \"default\""
       else
-        php "${currentPath}/add.php" "${magento2ConfigPath}" "db/table_prefix" ""
-        php "${currentPath}/add.php" "${magento2ConfigPath}" "db/connection/default/host" "${databaseHost}"
-        php "${currentPath}/add.php" "${magento2ConfigPath}" "db/connection/default/username" "${databaseUser}"
-        php "${currentPath}/add.php" "${magento2ConfigPath}" "db/connection/default/password" "${databasePassword}"
-        php "${currentPath}/add.php" "${magento2ConfigPath}" "db/connection/default/dbname" "${databaseName}"
-        php "${currentPath}/add.php" "${magento2ConfigPath}" "db/connection/default/model" "mysql4"
-        php "${currentPath}/add.php" "${magento2ConfigPath}" "db/connection/default/engine" "innodb"
-        php "${currentPath}/add.php" "${magento2ConfigPath}" "db/connection/default/initStatements" "SET NAMES utf8;"
-        php "${currentPath}/add.php" "${magento2ConfigPath}" "db/connection/default/active" "1"
-        php "${currentPath}/add.php" "${magento2ConfigPath}" "resource/default_setup/connection" "default"
+        php "${addScript}" "${magento2ConfigPath}" "db/table_prefix" ""
+        php "${addScript}" "${magento2ConfigPath}" "db/connection/default/host" "${databaseHost}"
+        php "${addScript}" "${magento2ConfigPath}" "db/connection/default/username" "${databaseUser}"
+        php "${addScript}" "${magento2ConfigPath}" "db/connection/default/password" "${databasePassword}"
+        php "${addScript}" "${magento2ConfigPath}" "db/connection/default/dbname" "${databaseName}"
+        php "${addScript}" "${magento2ConfigPath}" "db/connection/default/model" "mysql4"
+        php "${addScript}" "${magento2ConfigPath}" "db/connection/default/engine" "innodb"
+        php "${addScript}" "${magento2ConfigPath}" "db/connection/default/initStatements" "SET NAMES utf8;"
+        php "${addScript}" "${magento2ConfigPath}" "db/connection/default/active" "1"
+        php "${addScript}" "${magento2ConfigPath}" "resource/default_setup/connection" "default"
       fi
     fi
   fi
