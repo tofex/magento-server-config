@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+currentPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 scriptName="${0##*/}"
 
 usage()
@@ -8,23 +10,29 @@ cat >&2 << EOF
 usage: ${scriptName} options
 
 OPTIONS:
-  -h  Show this message
-  -o  Database host, default: localhost
-  -p  Database port, default: 3306
-  -u  Name of the database user
-  -s  Password of the database user
-  -b  Name of the database
-  -r  Prefix to use
+  --help              Show this message
+  --databaseHost      Database host, default: localhost
+  --databasePort      Database port, default: 3306
+  --databaseUser      Name of the database user
+  --databasePassword  Password of the database user
+  --databaseName      Name of the database
+  --prefix            Prefix to use
 
-Example: ${scriptName} -u magento -p magento -b magento -r 12345
+Example: ${scriptName} --databaseUser magento --databasePassword magento --databaseName magento --prefix 12345
 EOF
 }
 
-trim()
-{
-  echo -n "$1" | xargs
+versionCompare() {
+  if [[ "$1" == "$2" ]]; then
+    echo "0"
+  elif [[ "$1" = $(echo -e "$1\n$2" | sort -V | head -n1) ]]; then
+    echo "1"
+  else
+    echo "2"
+  fi
 }
 
+magentoVersion=
 databaseHost=
 databasePort=
 databaseUser=
@@ -32,20 +40,17 @@ databasePassword=
 databaseName=
 prefix=
 
-while getopts ho:p:u:s:b:t:v:r:? option; do
-  case "${option}" in
-    h) usage; exit 1;;
-    o) databaseHost=$(trim "$OPTARG");;
-    p) databasePort=$(trim "$OPTARG");;
-    u) databaseUser=$(trim "$OPTARG");;
-    s) databasePassword=$(trim "$OPTARG");;
-    b) databaseName=$(trim "$OPTARG");;
-    t) ;;
-    v) ;;
-    r) prefix=$(trim "$OPTARG");;
-    ?) usage; exit 1;;
-  esac
-done
+if [[ -f "${currentPath}/../../core/prepare-parameters.sh" ]]; then
+  source "${currentPath}/../../core/prepare-parameters.sh"
+elif [[ -f /tmp/prepare-parameters.sh ]]; then
+  source /tmp/prepare-parameters.sh
+fi
+
+if [[ -z "${magentoVersion}" ]]; then
+  echo "No magento version specified!"
+  usage
+  exit 1
+fi
 
 if [[ -z "${databaseHost}" ]]; then
   databaseHost="localhost"
@@ -83,4 +88,8 @@ export MYSQL_PWD="${databasePassword}"
 
 echo "Update prefixes in database with: ${prefix}"
 
-mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "UPDATE eav_entity_store SET INCREMENT_PREFIX = CONCAT(store_id, \"${prefix}\");"
+mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "UPDATE eav_entity_store SET increment_prefix = CONCAT(store_id, \"${prefix}\");"
+
+if [[ $(versionCompare "${magentoVersion}" "2.3.0") == 0 ]] || [[ $(versionCompare "${magentoVersion}" "2.3.0") == 2 ]]; then
+  mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "UPDATE sales_sequence_profile JOIN sales_sequence_meta ON sales_sequence_meta.meta_id = sales_sequence_profile.meta_id SET prefix = CONCAT(store_id, \"${prefix}\");"
+fi
