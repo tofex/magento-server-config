@@ -51,7 +51,7 @@ if [[ -z "${userPassword}" ]]; then
 fi
 
 if [[ -z "${userMail}" ]]; then
-  userMail="${userName}@localhost.local"
+  userMail="${userName}@dummy.host"
 fi
 
 if [[ -z "${hash}" ]]; then
