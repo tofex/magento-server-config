@@ -1,5 +1,6 @@
 #!/bin/bash -e
 
+currentPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 scriptName="${0##*/}"
 
 usage()
@@ -29,8 +30,6 @@ while getopts hp:? option; do
     ?) usage; exit 1;;
   esac
 done
-
-currentPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [[ ! -f "${currentPath}/../env.properties" ]]; then
   echo "No environment specified!"
