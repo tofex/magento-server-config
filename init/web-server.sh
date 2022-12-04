@@ -70,10 +70,13 @@ now=$(LC_ALL=en_US.utf8 date "+%a, %d %b %Y %H:%M:%S %z")
 if [[ ${magentoVersion:0:1} == 1 ]]; then
   magento1ConfigPath="${webPath}/app/etc"
 
-  if [[ "${webUser}" != "${currentUser}" ]] || [[ "${webGroup}" != "${currentGroup}" ]]; then
-    sudo -H -u "${webUser}" bash -c "mkdir -p ${magento1ConfigPath}"
-  else
-    mkdir -p "${magento1ConfigPath}"
+  if [[ ! -d "${magento1ConfigPath}" ]]; then
+    echo "Creating config path at: ${magento1ConfigPath}"
+    if [[ "${webUser}" != "${currentUser}" ]] || [[ "${webGroup}" != "${currentGroup}" ]]; then
+      sudo -H -u "${webUser}" bash -c "mkdir -p ${magento1ConfigPath}"
+    else
+      mkdir -p "${magento1ConfigPath}"
+    fi
   fi
 
   magento1ConfigFile="${magento1ConfigPath}/local.xml"
@@ -108,10 +111,13 @@ EOF
 else
   magento2ConfigPath="${webPath}/app/etc"
 
-  if [[ "${webUser}" != "${currentUser}" ]] || [[ "${webGroup}" != "${currentGroup}" ]]; then
-    sudo -H -u "${webUser}" bash -c "mkdir -p ${magento2ConfigPath}"
-  else
-    mkdir -p "${magento2ConfigPath}"
+  if [[ ! -d "${magento2ConfigPath}" ]]; then
+    echo "Creating config path at: ${magento2ConfigPath}"
+    if [[ "${webUser}" != "${currentUser}" ]] || [[ "${webGroup}" != "${currentGroup}" ]]; then
+      sudo -H -u "${webUser}" bash -c "mkdir -p ${magento2ConfigPath}"
+    else
+      mkdir -p "${magento2ConfigPath}"
+    fi
   fi
 
   magento2EnvironmentFile="${magento2ConfigPath}/env.php"
