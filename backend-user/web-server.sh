@@ -80,6 +80,8 @@ fi
 if [[ ${magentoVersion:0:1} == 1 ]]; then
   echo "No web action required for Magento ${magentoVersion}"
 elif [[ ${magentoVersion:0:1} == 2 ]]; then
+  echo cd "${webPath}"
   cd "${webPath}"
+  echo bin/magento admin:user:create --admin-user="${userName}" --admin-password="${userPassword}" --admin-firstname="Ad" --admin-lastname="Min" --admin-email="${userMail}"
   bin/magento admin:user:create --admin-user="${userName}" --admin-password="${userPassword}" --admin-firstname="Ad" --admin-lastname="Min" --admin-email="${userMail}"
 fi
