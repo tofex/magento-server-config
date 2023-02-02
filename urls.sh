@@ -2,8 +2,13 @@
 
 currentPath="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-mainHostName=$("${currentPath}/../core/server/host/single.sh")
+adminHostName=$("${currentPath}/../core/server/host/admin.sh" | cat)
 
-"${currentPath}/../core/script/run.sh" "install,database" "${currentPath}/urls/database.sh" \
-  --mainHostName "${mainHostName}"
-"${currentPath}/../core/script/run.sh" "install,host:all,database" "${currentPath}/urls/database-host.sh"
+if [[ -z "${adminHostName}" ]]; then
+  adminHostName=$("${currentPath}/../core/server/host/single.sh" | cat)
+fi
+
+"${currentPath}/../core/script/run.sh" "install,webServer:single,database" "${currentPath}/urls/database.sh" \
+  --adminHostName "${adminHostName}"
+"${currentPath}/../core/script/run.sh" "install,webServer:single,host:all,database" "${currentPath}/urls/database-host.sh"
+
