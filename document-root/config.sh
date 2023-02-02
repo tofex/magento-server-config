@@ -104,6 +104,8 @@ elif [[ ${magentoVersion:0:1} == 2 ]]; then
         echo "Setting document root not to pub directory"
         php "${addScript}" "${magento2ConfigPath}" "directories/document_root_is_pub" false
       fi
+      cd "${webPath}"
+      bin/magento app:config:import
     else
       echo "Nothing to set for Magento version: ${magentoVersion}"
     fi
