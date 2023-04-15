@@ -12,6 +12,7 @@ usage: ${scriptName} options
 OPTIONS:
   --help                   Show this message
   --magentoVersion         Magento version
+  --elasticsearchEngine    Search engine, default: core
   --elasticsearchVersion   Elasticsearch version
   --elasticsearchHost      Elasticsearch host
   --elasticsearchPort      Elasticsearch port
@@ -30,6 +31,7 @@ EOF
 }
 
 magentoVersion=
+elasticsearchEngine=
 elasticsearchVersion=
 elasticsearchHost=
 elasticsearchPort=
@@ -51,6 +53,10 @@ if [[ -z "${magentoVersion}" ]]; then
   echo "No Magento version specified!"
   usage
   exit 1
+fi
+
+if [[ -z "${elasticsearchEngine}" ]]; then
+  elasticsearchEngine="core"
 fi
 
 if [[ -z "${elasticsearchVersion}" ]]; then
@@ -115,45 +121,57 @@ elif [[ ${magentoVersion:0:1} == 2 ]]; then
     if [[ -f "${magento2ConfigFile}" ]]; then
       magento2ConfigPath=$(dirname "${magento2ConfigFile}")
 
-      if [[ "${elasticsearchMainVersion}" == 5 ]]; then
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/engine" "elasticsearch5"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch5_server_hostname" "${elasticsearchHost}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch5_server_port" "${elasticsearchPort}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch5_index_prefix" "${elasticsearchPrefix}"
-        if [[ -n "${elasticsearchUser}" ]] && [[ -n "${elasticsearchPassword}" ]]; then
-          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch5_enable_auth" 1
-          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch5_username" "${elasticsearchUser}"
-          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch5_password" "${elasticsearchPassword}"
-        fi
-      elif [[ "${elasticsearchMainVersion}" == 6 ]]; then
-        php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/engine" "elasticsearch6"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/elasticsearch6_server_hostname" "${elasticsearchHost}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/elasticsearch6_server_port" "${elasticsearchPort}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/elasticsearch6_index_prefix" "${elasticsearchPrefix}"
-        if [[ -n "${elasticsearchUser}" ]] && [[ -n "${elasticsearchPassword}" ]]; then
-          php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/elasticsearch6_enable_auth" 1
-          php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/elasticsearch6_username" "${elasticsearchUser}"
-          php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/elasticsearch6_password" "${elasticsearchPassword}"
-        fi
-      elif [[ "${elasticsearchMainVersion}" == 7 ]]; then
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/engine" "elasticsearch7"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch7_server_hostname" "${elasticsearchHost}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch7_server_port" "${elasticsearchPort}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch7_index_prefix" "${elasticsearchPrefix}"
-        if [[ -n "${elasticsearchUser}" ]] && [[ -n "${elasticsearchPassword}" ]]; then
-          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch7_enable_auth" 1
-          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch7_username" "${elasticsearchUser}"
-          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch7_password" "${elasticsearchPassword}"
+      if [[ "${elasticsearchEngine}" == "core" ]]; then
+        if [[ "${elasticsearchMainVersion}" == 5 ]]; then
+          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/engine" "elasticsearch5"
+          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch5_server_hostname" "${elasticsearchHost}"
+          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch5_server_port" "${elasticsearchPort}"
+          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch5_index_prefix" "${elasticsearchPrefix}"
+          if [[ -n "${elasticsearchUser}" ]] && [[ -n "${elasticsearchPassword}" ]]; then
+            php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch5_enable_auth" 1
+            php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch5_username" "${elasticsearchUser}"
+            php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch5_password" "${elasticsearchPassword}"
+          fi
+        elif [[ "${elasticsearchMainVersion}" == 6 ]]; then
+          php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/engine" "elasticsearch6"
+          php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/elasticsearch6_server_hostname" "${elasticsearchHost}"
+          php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/elasticsearch6_server_port" "${elasticsearchPort}"
+          php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/elasticsearch6_index_prefix" "${elasticsearchPrefix}"
+          if [[ -n "${elasticsearchUser}" ]] && [[ -n "${elasticsearchPassword}" ]]; then
+            php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/elasticsearch6_enable_auth" 1
+            php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/elasticsearch6_username" "${elasticsearchUser}"
+            php "${addScript}" "${magento2ConfigPath}" "system/default/system/default/catalog/search/elasticsearch6_password" "${elasticsearchPassword}"
+          fi
+        elif [[ "${elasticsearchMainVersion}" == 7 ]]; then
+          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/engine" "elasticsearch7"
+          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch7_server_hostname" "${elasticsearchHost}"
+          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch7_server_port" "${elasticsearchPort}"
+          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch7_index_prefix" "${elasticsearchPrefix}"
+          if [[ -n "${elasticsearchUser}" ]] && [[ -n "${elasticsearchPassword}" ]]; then
+            php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch7_enable_auth" 1
+            php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch7_username" "${elasticsearchUser}"
+            php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch7_password" "${elasticsearchPassword}"
+          fi
+        else
+          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/engine" "elasticsearch"
+          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch_server_hostname" "${elasticsearchHost}"
+          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch_server_port" "${elasticsearchPort}"
+          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch_index_prefix" "${elasticsearchPrefix}"
+          if [[ -n "${elasticsearchUser}" ]] && [[ -n "${elasticsearchPassword}" ]]; then
+            php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch_enable_auth" 1
+            php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch_username" "${elasticsearchUser}"
+            php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch_password" "${elasticsearchPassword}"
+          fi
         fi
       else
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/engine" "elasticsearch"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch_server_hostname" "${elasticsearchHost}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch_server_port" "${elasticsearchPort}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch_index_prefix" "${elasticsearchPrefix}"
-        if [[ -n "${elasticsearchUser}" ]] && [[ -n "${elasticsearchPassword}" ]]; then
-          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch_enable_auth" 1
-          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch_username" "${elasticsearchUser}"
-          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/elasticsearch_password" "${elasticsearchPassword}"
+        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/engine" "${elasticsearchEngine}"
+        if [[ "${elasticsearchEngine}" == "elasticsuite" ]]; then
+          php "${addScript}" "${magento2ConfigPath}" "system/default/smile_elasticsuite_core_base_settings/es_client/servers" "${elasticsearchHost}:${elasticsearchPort}"
+          if [[ -n "${elasticsearchUser}" ]] && [[ -n "${elasticsearchPassword}" ]]; then
+            php "${addScript}" "${magento2ConfigPath}" "system/default/smile_elasticsuite_core_base_settings/es_client/enable_http_auth" 1
+            php "${addScript}" "${magento2ConfigPath}" "system/default/smile_elasticsuite_core_base_settings/es_client/http_auth_user" "${elasticsearchUser}"
+            php "${addScript}" "${magento2ConfigPath}" "system/default/smile_elasticsuite_core_base_settings/es_client/http_auth_pwd" "${elasticsearchPassword}"
+          fi
         fi
       fi
       cd "${webPath}"
