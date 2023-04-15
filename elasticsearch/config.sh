@@ -29,11 +29,6 @@ Example: ${scriptName} --magentoVersion --elasticsearchVersion 7.9  --elasticsea
 EOF
 }
 
-trim()
-{
-  echo -n "$1" | xargs
-}
-
 magentoVersion=
 elasticsearchVersion=
 elasticsearchHost=
