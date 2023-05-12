@@ -53,7 +53,7 @@ if [[ -z "${webPath}" ]]; then
   exit 1
 fi
 
-if [[ $(versionCompare "${magentoVersion}" "2.4.0") == 0 ]] || [[ $(versionCompare "${magentoVersion}" "2.4.0") == 2 ]]; then
+if { [[ $(versionCompare "${magentoVersion}" "2.4.0") == 0 ]] || [[ $(versionCompare "${magentoVersion}" "2.4.0") == 2 ]]; } && [[ $(versionCompare "${magentoVersion}" "19.1.0") == 1 ]]; then
   cd "${webPath}"
   if [[ "${enable}" == 1 ]]; then
     echo "Enabling two factor auth"

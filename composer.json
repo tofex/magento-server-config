@@ -1,6 +1,6 @@
 {
   "name": "tofex/magento-server-config",
-  "version": "1.0.40",
+  "version": "1.0.41",
   "type": "magento-server-component",
   "description": "Tofex Magento Server Configuration",
   "license": "MIT",
