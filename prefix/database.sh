@@ -90,6 +90,6 @@ echo "Update prefixes in database with: ${prefix}"
 
 mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "UPDATE eav_entity_store SET increment_prefix = CONCAT(store_id, \"${prefix}\");"
 
-if [[ $(versionCompare "${magentoVersion}" "2.3.0") == 0 ]] || [[ $(versionCompare "${magentoVersion}" "2.3.0") == 2 ]]; then
+if { [[ $(versionCompare "${magentoVersion}" "2.3.0") == 0 ]] || [[ $(versionCompare "${magentoVersion}" "2.3.0") == 2 ]]; } && [[ $(versionCompare "${magentoVersion}" "19.1.0") == 1 ]]; then
   mysql -h"${databaseHost}" -P"${databasePort}" -u"${databaseUser}" "${databaseName}" -e "UPDATE sales_sequence_profile JOIN sales_sequence_meta ON sales_sequence_meta.meta_id = sales_sequence_profile.meta_id SET prefix = CONCAT(store_id, \"${prefix}\");"
 fi
