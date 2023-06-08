@@ -26,7 +26,7 @@ OPTIONS:
   --mergeScriptPhpScript   Merge script PHP script (required if Magento 1)
   --addScript              Add PHP script (required if Magento 2)
 
-Example: ${scriptName} --magentoVersion --elasticsearchVersion 7.9  --elasticsearchHost localhost --elasticsearchPort 9200 --webPath /var/www/magento/htdocs --addScript /tmp/add.php
+Example: ${scriptName} --magentoVersion 2.4.5 --elasticsearchVersion 7.9  --elasticsearchHost localhost --elasticsearchPort 9200 --webPath /var/www/magento/htdocs --addScript /tmp/add.php
 EOF
 }
 
