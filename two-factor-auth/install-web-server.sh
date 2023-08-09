@@ -53,7 +53,17 @@ if [[ -z "${webPath}" ]]; then
   exit 1
 fi
 
-if { [[ $(versionCompare "${magentoVersion}" "2.4.0") == 0 ]] || [[ $(versionCompare "${magentoVersion}" "2.4.0") == 2 ]]; } && [[ $(versionCompare "${magentoVersion}" "19.1.0") == 1 ]]; then
+if { [[ $(versionCompare "${magentoVersion}" "2.4.6") == 0 ]] || [[ $(versionCompare "${magentoVersion}" "2.4.6") == 2 ]]; } && [[ $(versionCompare "${magentoVersion}" "19.1.0") == 1 ]]; then
+  cd "${webPath}"
+  if [[ "${enable}" == 1 ]]; then
+    echo "Enabling two factor auth"
+    bin/magento module:enable Magento_AdminAdobeImsTwoFactorAuth Magento_TwoFactorAuth
+  fi
+  if [[ "${disable}" == 1 ]]; then
+    echo "Disabling two factor auth"
+    bin/magento module:disable Magento_AdminAdobeImsTwoFactorAuth Magento_TwoFactorAuth
+  fi
+elif { [[ $(versionCompare "${magentoVersion}" "2.4.0") == 0 ]] || [[ $(versionCompare "${magentoVersion}" "2.4.0") == 2 ]]; } && [[ $(versionCompare "${magentoVersion}" "19.1.0") == 1 ]]; then
   cd "${webPath}"
   if [[ "${enable}" == 1 ]]; then
     echo "Enabling two factor auth"
