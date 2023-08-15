@@ -1,13 +1,13 @@
 {
-  "name": "tofex/magento-server-config",
-  "version": "1.0.43",
-  "type": "magento-server-component",
-  "description": "Tofex Magento Server Configuration",
-  "license": "MIT",
-  "require": {
-    "php": ">=7.0"
-  },
-  "extra": {
-    "installer-name": "config"
-  }
+    "name": "tofex/magento-server-config",
+    "version": "1.0.44",
+    "type": "magento-server-component",
+    "description": "Tofex Magento Server Configuration",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.0"
+    },
+    "extra": {
+        "installer-name": "config"
+    }
 }
