@@ -109,7 +109,11 @@ elif [[ ${magentoVersion:0:1} == 2 ]]; then
     exit 1
   fi
 
-  magento2ConfigFile="${webPath}/app/etc/config.php"
+  if [[ -n "${PROJECT_ENV}" ]]; then
+    magento2ConfigFile="${webPath}/app/etc/env/${PROJECT_ENV}.php"
+  else
+    magento2ConfigFile="${webPath}/app/etc/config.php"
+  fi
 
   if [[ -e "${magento2ConfigFile}" ]]; then
     if [[ -L "${magento2ConfigFile}" ]]; then
@@ -117,23 +121,28 @@ elif [[ ${magentoVersion:0:1} == 2 ]]; then
     fi
 
     if [[ -f "${magento2ConfigFile}" ]]; then
-      magento2ConfigPath=$(dirname "${magento2ConfigFile}")
-
       if [[ "${openSearchEngine}" == "core" ]]; then
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/engine" "opensearch"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/opensearch_server_hostname" "${openSearchHost}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/opensearch_server_port" "${openSearchPort}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/opensearch_index_prefix" "${openSearchPrefix}"
+        php "${addScript}" "${magento2ConfigFile}" "system/default/catalog/search/engine" "opensearch"
+        php "${addScript}" "${magento2ConfigFile}" "system/default/catalog/search/opensearch_server_hostname" "${openSearchHost}"
+        php "${addScript}" "${magento2ConfigFile}" "system/default/catalog/search/opensearch_server_port" "${openSearchPort}"
+        php "${addScript}" "${magento2ConfigFile}" "system/default/catalog/search/opensearch_index_prefix" "${openSearchPrefix}"
         if [[ -n "${openSearchUser}" ]] && [[ -n "${openSearchPassword}" ]]; then
-          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/opensearch_enable_auth" 1
-          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/opensearch_username" "${openSearchUser}"
-          php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/opensearch_password" "${openSearchPassword}"
+          php "${addScript}" "${magento2ConfigFile}" "system/default/catalog/search/opensearch_enable_auth" 1
+          php "${addScript}" "${magento2ConfigFile}" "system/default/catalog/search/opensearch_username" "${openSearchUser}"
+          php "${addScript}" "${magento2ConfigFile}" "system/default/catalog/search/opensearch_password" "${openSearchPassword}"
         fi
       else
-        php "${addScript}" "${magento2ConfigPath}" "system/default/catalog/search/engine" "${openSearchEngine}"
+        php "${addScript}" "${magento2ConfigFile}" "system/default/catalog/search/engine" "${openSearchEngine}"
       fi
+
       cd "${webPath}"
       bin/magento app:config:import
+    else
+      >&2 echo "Configuration file not found at: ${magento2ConfigFile}"
+      exit 1
     fi
+  else
+    >&2 echo "Configuration file not found at: ${magento2ConfigFile}"
+    exit 1
   fi
 fi

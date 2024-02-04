@@ -157,7 +157,7 @@ elif [[ ${magentoVersion:0:1} == 2 ]]; then
     exit 1
   fi
 
-  magento2ConfigFile="${webPath}/app/etc/config.php"
+  magento2ConfigFile="${webPath}/app/etc/env.php"
 
   if [[ -e "${magento2ConfigFile}" ]]; then
     if [[ -L "${magento2ConfigFile}" ]]; then
@@ -168,16 +168,16 @@ elif [[ ${magentoVersion:0:1} == 2 ]]; then
       magento2ConfigPath=$(dirname "${magento2ConfigFile}")
 
       if [[ "${webUser}" != "${currentUser}" ]] || [[ "${webGroup}" != "${currentGroup}" ]]; then
-        sudo -H -u "${webUser}" bash -c "php ${currentPath}/add.php \"${magento2ConfigPath}\" \"db/table_prefix\" \"\""
-        sudo -H -u "${webUser}" bash -c "php ${currentPath}/add.php \"${magento2ConfigPath}\" \"db/connection/default/host\" \"${databaseHost}\""
-        sudo -H -u "${webUser}" bash -c "php ${currentPath}/add.php \"${magento2ConfigPath}\" \"db/connection/default/username\" \"${databaseUser}\""
-        sudo -H -u "${webUser}" bash -c "php ${currentPath}/add.php \"${magento2ConfigPath}\" \"db/connection/default/password\" \"${databasePassword}\""
-        sudo -H -u "${webUser}" bash -c "php ${currentPath}/add.php \"${magento2ConfigPath}\" \"db/connection/default/dbname\" \"${databaseName}\""
-        sudo -H -u "${webUser}" bash -c "php ${currentPath}/add.php \"${magento2ConfigPath}\" \"db/connection/default/model\" \"mysql4\""
-        sudo -H -u "${webUser}" bash -c "php ${currentPath}/add.php \"${magento2ConfigPath}\" \"db/connection/default/engine\" \"innodb\""
-        sudo -H -u "${webUser}" bash -c "php ${currentPath}/add.php \"${magento2ConfigPath}\" \"db/connection/default/initStatements\" \"SET NAMES utf8;\""
-        sudo -H -u "${webUser}" bash -c "php ${currentPath}/add.php \"${magento2ConfigPath}\" \"db/connection/default/active\" \"1\""
-        sudo -H -u "${webUser}" bash -c "php ${currentPath}/add.php \"${magento2ConfigPath}\" \"resource/default_setup/connection\" \"default\""
+        sudo -H -u "${webUser}" bash -c "php ${addScript} \"${magento2ConfigPath}\" \"db/table_prefix\" \"\""
+        sudo -H -u "${webUser}" bash -c "php ${addScript} \"${magento2ConfigPath}\" \"db/connection/default/host\" \"${databaseHost}\""
+        sudo -H -u "${webUser}" bash -c "php ${addScript} \"${magento2ConfigPath}\" \"db/connection/default/username\" \"${databaseUser}\""
+        sudo -H -u "${webUser}" bash -c "php ${addScript} \"${magento2ConfigPath}\" \"db/connection/default/password\" \"${databasePassword}\""
+        sudo -H -u "${webUser}" bash -c "php ${addScript} \"${magento2ConfigPath}\" \"db/connection/default/dbname\" \"${databaseName}\""
+        sudo -H -u "${webUser}" bash -c "php ${addScript} \"${magento2ConfigPath}\" \"db/connection/default/model\" \"mysql4\""
+        sudo -H -u "${webUser}" bash -c "php ${addScript} \"${magento2ConfigPath}\" \"db/connection/default/engine\" \"innodb\""
+        sudo -H -u "${webUser}" bash -c "php ${addScript} \"${magento2ConfigPath}\" \"db/connection/default/initStatements\" \"SET NAMES utf8;\""
+        sudo -H -u "${webUser}" bash -c "php ${addScript} \"${magento2ConfigPath}\" \"db/connection/default/active\" \"1\""
+        sudo -H -u "${webUser}" bash -c "php ${addScript} \"${magento2ConfigPath}\" \"resource/default_setup/connection\" \"default\""
       else
         php "${addScript}" "${magento2ConfigPath}" "db/table_prefix" ""
         php "${addScript}" "${magento2ConfigPath}" "db/connection/default/host" "${databaseHost}"

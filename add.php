@@ -86,33 +86,24 @@ if ( ! array_key_exists(3, $argv)) {
     die(1);
 }
 
-$path = rtrim($argv[ 1 ], '/');
+$magento2ConfigFile = trim($argv[ 1 ]);
 $key = trim($argv[ 2 ]);
 $value = trim($argv[ 3 ]);
 
-$magento2ConfigFile = sprintf('%s/config.php', $path);
-$magento2EnvironmentFile = sprintf('%s/env.php', $path);
+if (file_exists($magento2ConfigFile) && is_dir($magento2ConfigFile)) {
+    $keys = explode('/', $key);
+    $firstKey = array_shift($keys);
+
+    $magento2ConfigFile = sprintf('%s/%s', $magento2ConfigFile, $firstKey === 'system' ? 'config.php' : 'env.php');
+}
 
 if ( ! file_exists($magento2ConfigFile) || ! is_writable($magento2ConfigFile)) {
     echo sprintf("Configuration file not writeable at: %s\n", $magento2ConfigFile);
     exit(1);
 }
 
-if ( ! file_exists($magento2EnvironmentFile) || ! is_writable($magento2EnvironmentFile)) {
-    echo sprintf("Environment file not writeable at: %s\n", $magento2EnvironmentFile);
-    exit(1);
-}
-
-$keys = explode('/', $key);
-$firstKey = array_shift($keys);
-
-if ($firstKey === 'system') {
-    echo "Reading configuration file: $magento2ConfigFile\n";
-    $configuration = readToVariable($magento2ConfigFile);
-} else {
-    echo "Reading configuration file: $magento2EnvironmentFile\n";
-    $configuration = readToVariable($magento2EnvironmentFile);
-}
+echo "Reading configuration file: $magento2ConfigFile\n";
+$configuration = readToVariable($magento2ConfigFile);
 
 if ($value === 'true') {
     $value = true;
@@ -123,10 +114,5 @@ if ($value === 'true') {
 echo "Adding key: $key\n";
 $configuration = addDeepValue($configuration, explode('/', $key), $value);
 
-if ($firstKey === 'system') {
-    echo "Writing configuration file: $magento2ConfigFile\n";
-    file_put_contents($magento2ConfigFile, "<?php\nreturn " . varExport($configuration) . ';');
-} else {
-    echo "Writing configuration file: $magento2EnvironmentFile\n";
-    file_put_contents($magento2EnvironmentFile, "<?php\nreturn " . varExport($configuration) . ';');
-}
+echo "Writing configuration file: $magento2ConfigFile\n";
+file_put_contents($magento2ConfigFile, "<?php\nreturn " . varExport($configuration) . ';');

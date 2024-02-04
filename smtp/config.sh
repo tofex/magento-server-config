@@ -83,7 +83,11 @@ elif [[ ${magentoVersion:0:1} == 2 ]]; then
     exit 1
   fi
 
-  magento2ConfigFile="${webPath}/app/etc/config.php"
+  if [[ -n "${PROJECT_ENV}" ]]; then
+    magento2ConfigFile="${webPath}/app/etc/env/${PROJECT_ENV}.php"
+  else
+    magento2ConfigFile="${webPath}/app/etc/config.php"
+  fi
 
   if [[ -e "${magento2ConfigFile}" ]]; then
     if [[ -L "${magento2ConfigFile}" ]]; then
@@ -91,25 +95,29 @@ elif [[ ${magentoVersion:0:1} == 2 ]]; then
     fi
 
     if [[ -f "${magento2ConfigFile}" ]]; then
-      magento2ConfigPath=$(dirname "${magento2ConfigFile}")
-
       if [[ "${smtpEnabled}" == "yes" ]]; then
-        php "${addScript}" "${magento2ConfigPath}" "system/default/smtp/general/enabled" "1"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/smtp/configuration_option/host" "${smtpHost}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/smtp/configuration_option/port" "${smtpPort}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/smtp/configuration_option/protocol" "${smtpProtocol}"
-        php "${addScript}" "${magento2ConfigPath}" "system/default/smtp/configuration_option/authentication" "${smtpAuthentication}"
+        php "${addScript}" "${magento2ConfigFile}" "system/default/smtp/general/enabled" "1"
+        php "${addScript}" "${magento2ConfigFile}" "system/default/smtp/configuration_option/host" "${smtpHost}"
+        php "${addScript}" "${magento2ConfigFile}" "system/default/smtp/configuration_option/port" "${smtpPort}"
+        php "${addScript}" "${magento2ConfigFile}" "system/default/smtp/configuration_option/protocol" "${smtpProtocol}"
+        php "${addScript}" "${magento2ConfigFile}" "system/default/smtp/configuration_option/authentication" "${smtpAuthentication}"
 
         if [[ "${smtpAuthentication}" != "none" ]]; then
-          php "${addScript}" "${magento2ConfigPath}" "system/default/smtp/configuration_option/username" "${smtpUser}"
-          php "${addScript}" "${magento2ConfigPath}" "system/default/smtp/configuration_option/password" "${smtpPassword}"
+          php "${addScript}" "${magento2ConfigFile}" "system/default/smtp/configuration_option/username" "${smtpUser}"
+          php "${addScript}" "${magento2ConfigFile}" "system/default/smtp/configuration_option/password" "${smtpPassword}"
         fi
       else
-        php "${addScript}" "${magento2ConfigPath}" "system/default/smtp/general/enabled" "0"
+        php "${addScript}" "${magento2ConfigFile}" "system/default/smtp/general/enabled" "0"
       fi
 
       cd "${webPath}"
       bin/magento app:config:import
+    else
+      >&2 echo "Configuration file not found at: ${magento2ConfigFile}"
+      exit 1
     fi
+  else
+    >&2 echo "Configuration file not found at: ${magento2ConfigFile}"
+    exit 1
   fi
 fi
