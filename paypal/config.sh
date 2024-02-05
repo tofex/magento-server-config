@@ -11,6 +11,7 @@ usage: ${scriptName} options
 
 OPTIONS:
   --help            Show this message
+  --environment     Name of environment (optional)
   --magentoVersion  Magento version
   --webPath         Web path
   --webUser         Web user
@@ -25,6 +26,7 @@ trim() {
   echo -n "$1" | xargs
 }
 
+environment=
 magentoVersion=
 webPath=
 webUser=
@@ -130,8 +132,8 @@ elif [[ ${magentoVersion:0:1} == 2 ]]; then
     exit 1
   fi
 
-  if [[ -n "${PROJECT_ENV}" ]]; then
-    magento2ConfigFile="${webPath}/app/etc/env/${PROJECT_ENV}.php"
+  if [[ -n "${environment}" ]]; then
+    magento2ConfigFile="${webPath}/app/etc/env/${environment}.php"
   else
     magento2ConfigFile="${webPath}/app/etc/config.php"
   fi

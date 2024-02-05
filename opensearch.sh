@@ -28,4 +28,4 @@ while getopts h? option; do
 done
 
 "${currentPath}/../core/script/run.sh" "database" "${currentPath}/opensearch/database.sh"
-"${currentPath}/../core/script/run.sh" "config,install,openSearch,webServer" "${currentPath}/opensearch/config.sh"
+"${currentPath}/../core/script/run.sh" "config,install,system,openSearch,webServer" "${currentPath}/opensearch/config.sh"

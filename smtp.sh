@@ -29,4 +29,4 @@ while getopts h? option; do
 done
 
 "${currentPath}/../core/script/run.sh" "database" "${currentPath}/smtp/database.sh"
-"${currentPath}/../core/script/run.sh" "config,install,smtp,webServer" "${currentPath}/smtp/config.sh"
+"${currentPath}/../core/script/run.sh" "config,install,system,smtp,webServer" "${currentPath}/smtp/config.sh"

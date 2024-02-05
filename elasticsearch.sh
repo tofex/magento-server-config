@@ -28,4 +28,4 @@ while getopts h? option; do
 done
 
 "${currentPath}/../core/script/run.sh" "database" "${currentPath}/elasticsearch/database.sh"
-"${currentPath}/../core/script/run.sh" "config,install,elasticsearch,webServer" "${currentPath}/elasticsearch/config.sh"
+"${currentPath}/../core/script/run.sh" "config,install,system,elasticsearch,webServer" "${currentPath}/elasticsearch/config.sh"

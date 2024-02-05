@@ -78,7 +78,7 @@ if [[ -z "${merchantAccountId}" ]]; then
 fi
 
 "${currentPath}/../core/script/run.sh" "database" "${currentPath}/paypal/database.sh"
-"${currentPath}/../core/script/run.sh" "config,config,install,webServer" "${currentPath}/paypal/config.sh" \
+"${currentPath}/../core/script/run.sh" "config,config,system,install,webServer" "${currentPath}/paypal/config.sh" \
   --businessAccount "${businessAccount}" \
   --apiUserName "${apiUserName}" \
   --apiPassword "${apiPassword}" \

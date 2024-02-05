@@ -11,6 +11,7 @@ usage: ${scriptName} options
 
 OPTIONS:
   --help                   Show this message
+  --environment            Name of environment (optional)
   --magentoVersion         Magento version
   --elasticsearchEngine    Search engine, default: core
   --elasticsearchVersion   Elasticsearch version
@@ -30,6 +31,7 @@ Example: ${scriptName} --magentoVersion 2.4.5 --elasticsearchVersion 7.9  --elas
 EOF
 }
 
+environment=
 magentoVersion=
 elasticsearchEngine=
 elasticsearchVersion=
@@ -111,8 +113,8 @@ elif [[ ${magentoVersion:0:1} == 2 ]]; then
     exit 1
   fi
 
-  if [[ -n "${PROJECT_ENV}" ]]; then
-    magento2ConfigFile="${webPath}/app/etc/env/${PROJECT_ENV}.php"
+  if [[ -n "${environment}" ]]; then
+    magento2ConfigFile="${webPath}/app/etc/env/${environment}.php"
   else
     magento2ConfigFile="${webPath}/app/etc/config.php"
   fi
