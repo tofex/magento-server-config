@@ -10,14 +10,15 @@ cat >&2 << EOF
 usage: ${scriptName} options
 
 OPTIONS:
-  --help            Show this message
-  --magentoVersion  Magento version
-  --cryptKey        Crypt key of installation
-  --webPath         Web path
-  --webUser         Web user (optional)
-  --webGroup        Web group (optional)
-  --force           Force overwrite
-  --ignore          Ignore existing files
+  --help              Show this message
+  --magentoVersion    Magento version
+  --cryptKey          Crypt key of installation
+  --webPath           Web path
+  --webUser           Web user (optional)
+  --webGroup          Web group (optional)
+  --force             Force overwrite
+  --ignore            Ignore existing files
+  --environmentSetup  Setup environment configuration file (optional)
 
 Example: ${scriptName}
 EOF
@@ -30,6 +31,7 @@ webUser=
 webGroup=
 force=0
 ignore=0
+environmentSetup=
 
 if [[ -f "${currentPath}/../../core/prepare-parameters.sh" ]]; then
   source "${currentPath}/../../core/prepare-parameters.sh"
@@ -120,11 +122,26 @@ else
     fi
   fi
 
+  if [[ -n "${environmentSetup}" ]]; then
+    magento2ConfigEnvPath="${webPath}/app/etc/env"
+
+    if [[ ! -d "${magento2ConfigEnvPath}" ]]; then
+      echo "Creating config environment path at: ${magento2ConfigEnvPath}"
+      if [[ "${webUser}" != "${currentUser}" ]] || [[ "${webGroup}" != "${currentGroup}" ]]; then
+        sudo -H -u "${webUser}" bash -c "mkdir -p ${magento2ConfigEnvPath}"
+      else
+        mkdir -p "${magento2ConfigEnvPath}"
+      fi
+    fi
+  fi
+
   magento2EnvironmentFile="${magento2ConfigPath}/env.php"
   if [[ -f "${magento2EnvironmentFile}" ]]; then
-    echo "Environment already exists!"
     if [[ "${force}" == 0 ]] && [[ "${ignore}" == 0 ]]; then
+      >&2 echo "Environment file already exists!"
       exit 1
+    else
+      echo "Environment file already exists!"
     fi
   fi
 
@@ -138,9 +155,11 @@ else
 
   magento2ConfigFile="${magento2ConfigPath}/config.php"
   if [[ -f "${magento2ConfigFile}" ]]; then
-    echo "Configuration already exists!"
     if [[ "${force}" == 0 ]] && [[ "${ignore}" == 0 ]]; then
+      >&2 echo "Configuration file already exists!"
       exit 1
+    else
+      echo "Configuration file already exists!"
     fi
   fi
 
@@ -149,6 +168,44 @@ else
       sudo -H -u "${webUser}" bash -c "rm ${magento2ConfigFile}"
     else
       rm "${magento2ConfigFile}"
+    fi
+  fi
+
+  if [[ -n "${environmentSetup}" ]]; then
+    magento2ConfigEnvBaseFile="${magento2ConfigEnvPath}/base.php"
+    if [[ -f "${magento2ConfigEnvBaseFile}" ]]; then
+      if [[ "${force}" == 0 ]] && [[ "${ignore}" == 0 ]]; then
+        >&2 echo "Configuration environment base file already exists!"
+        exit 1
+      else
+        echo "Configuration environment base file already exists!"
+      fi
+    fi
+
+    if [[ -L "${magento2ConfigEnvBaseFile}" ]] && [[ "${ignore}" == 0 ]]; then
+      if [[ "${webUser}" != "${currentUser}" ]] || [[ "${webGroup}" != "${currentGroup}" ]]; then
+        sudo -H -u "${webUser}" bash -c "rm ${magento2ConfigEnvBaseFile}"
+      else
+        rm "${magento2ConfigEnvBaseFile}"
+      fi
+    fi
+
+    magento2ConfigEnvFile="${magento2ConfigEnvPath}/${environmentSetup}.php"
+    if [[ -f "${magento2ConfigEnvFile}" ]]; then
+      if [[ "${force}" == 0 ]] && [[ "${ignore}" == 0 ]]; then
+        >&2 echo "Configuration environment file already exists!"
+        exit 1
+      else
+        echo "Configuration environment file already exists!"
+      fi
+    fi
+
+    if [[ -L "${magento2ConfigEnvFile}" ]] && [[ "${ignore}" == 0 ]]; then
+      if [[ "${webUser}" != "${currentUser}" ]] || [[ "${webGroup}" != "${currentGroup}" ]]; then
+        sudo -H -u "${webUser}" bash -c "rm ${magento2ConfigEnvFile}"
+      else
+        rm "${magento2ConfigEnvFile}"
+      fi
     fi
   fi
 
@@ -198,5 +255,25 @@ return [
     'modules' => []
 ];
 EOF
+  fi
+
+  if [[ -n "${environmentSetup}" ]]; then
+    if [[ ! -f "${magento2ConfigEnvBaseFile}" ]] || [[ "${ignore}" == 0 ]]; then
+      echo "Creating configuration file at: ${magento2ConfigEnvBaseFile}"
+      cat <<EOF | sudo -H -u "${webUser}" bash -c "tee ${magento2ConfigEnvBaseFile}" > /dev/null
+<?php
+return [
+];
+EOF
+    fi
+
+    if [[ ! -f "${magento2ConfigEnvFile}" ]] || [[ "${ignore}" == 0 ]]; then
+      echo "Creating configuration file at: ${magento2ConfigEnvFile}"
+      cat <<EOF | sudo -H -u "${webUser}" bash -c "tee ${magento2ConfigEnvFile}" > /dev/null
+<?php
+return [
+];
+EOF
+    fi
   fi
 fi

@@ -13,8 +13,9 @@ OPTIONS:
   -h  Show this message
   -f  Force to overwrite existing configuration
   -i  Ignore existing configuration
+  -e  Setup environment configuration file (optional)
 
-Example: ${scriptName} -f
+Example: ${scriptName} -f -e local
 EOF
 }
 
@@ -23,17 +24,27 @@ trim()
   echo -n "$1" | xargs
 }
 
-force=0
-ignore=0
+force=
+ignore=
+environmentSetup=
 
-while getopts hfi? option; do
+while getopts hfie:? option; do
   case "${option}" in
     h) usage; exit 1;;
     f) force=1;;
     i) ignore=1;;
+    e) environmentSetup=$(trim "$OPTARG");;
     ?) usage; exit 1;;
   esac
 done
+
+if [[ -z "${force}" ]]; then
+  force=0
+fi
+
+if [[ -z "${ignore}" ]]; then
+  ignore=0
+fi
 
 if [[ ! -f "${currentPath}/../env.properties" ]]; then
   echo "No environment specified!"
@@ -47,9 +58,16 @@ if [[ -z "${magentoVersion}" ]]; then
   exit 1
 fi
 
-"${currentPath}/../core/script/run.sh" "install,webServer" "${currentPath}/init/web-server.sh" \
-  --force "${force}" \
-  --ignore "${ignore}"
+if [[ -n "${environmentSetup}" ]]; then
+  "${currentPath}/../core/script/run.sh" "install,webServer" "${currentPath}/init/web-server.sh" \
+    --force "${force}" \
+    --ignore "${ignore}" \
+    --environmentSetup "${environmentSetup}"
+else
+  "${currentPath}/../core/script/run.sh" "install,webServer" "${currentPath}/init/web-server.sh" \
+    --force "${force}" \
+    --ignore "${ignore}"
+fi
 
 if [[ ${magentoVersion:0:1} == 1 ]]; then
   "${currentPath}/../core/script/web-server/all.sh" "${currentPath}/../ops/create-shared/web-server.sh" \
@@ -70,4 +88,14 @@ else
     -o
   "${currentPath}/../core/script/env/web-servers.sh" "${currentPath}/../ops/create-shared/env-web-server.sh" \
     -f "app/etc/config.php"
+
+  if [[ -n "${environmentSetup}" ]]; then
+    "${currentPath}/../core/script/web-server/all.sh" "${currentPath}/../ops/create-shared/web-server.sh" \
+      -f "app/etc/env/base.php" \
+      -o
+    "${currentPath}/../core/script/env/web-servers.sh" "${currentPath}/../ops/create-shared/env-web-server.sh" \
+      -f "app/etc/env/base.php"
+
+    ini-set "${currentPath}/../env.properties" yes system environment "${environmentSetup}"
+  fi
 fi
