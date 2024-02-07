@@ -70,31 +70,71 @@ else
 fi
 
 if [[ ${magentoVersion:0:1} == 1 ]]; then
-  "${currentPath}/../core/script/web-server/all.sh" "${currentPath}/../ops/create-shared/web-server.sh" \
-    -f "app/etc/local.xml" \
-    -o
+  fileStatus=$("${currentPath}/../core/script/run-quiet.sh" "webServer:single" "${currentPath}/../ops/create-shared/web-server-check.sh" \
+    --fileName "app/etc/local.xml")
 
-  "${currentPath}/../core/script/env/web-servers.sh" "${currentPath}/../ops/create-shared/env-web-server.sh" \
-    -f "app/etc/local.xml"
+  if [[ "${fileStatus}" == "mounted" ]]; then
+    echo "app/etc/local.xml is mounted"
+  else
+    "${currentPath}/../core/script/run.sh" "webServer:all" "${currentPath}/../ops/create-shared/web-server.sh" \
+      --fileName "app/etc/local.xml" \
+      --overwrite
+    "${currentPath}/../core/script/run.sh" "webServer:all,env:local" "${currentPath}/../ops/create-shared/web-server-env.sh" \
+      --fileName "app/etc/local.xml"
+  fi
 else
-  "${currentPath}/../core/script/web-server/all.sh" "${currentPath}/../ops/create-shared/web-server.sh" \
-    -f "app/etc/env.php" \
-    -o
-  "${currentPath}/../core/script/env/web-servers.sh" "${currentPath}/../ops/create-shared/env-web-server.sh" \
-    -f "app/etc/env.php"
+  fileStatus=$("${currentPath}/../core/script/run-quiet.sh" "webServer:single" "${currentPath}/../ops/create-shared/web-server-check.sh" \
+    --fileName "app/etc/env.php")
 
-  "${currentPath}/../core/script/web-server/all.sh" "${currentPath}/../ops/create-shared/web-server.sh" \
-    -f "app/etc/config.php" \
-    -o
-  "${currentPath}/../core/script/env/web-servers.sh" "${currentPath}/../ops/create-shared/env-web-server.sh" \
-    -f "app/etc/config.php"
+  if [[ "${fileStatus}" == "mounted" ]]; then
+    echo "app/etc/env.php is mounted"
+  else
+    "${currentPath}/../core/script/run.sh" "webServer:all" "${currentPath}/../ops/create-shared/web-server.sh" \
+      --fileName "app/etc/env.php" \
+      --overwrite
+    "${currentPath}/../core/script/run.sh" "webServer:all,env:local" "${currentPath}/../ops/create-shared/web-server-env.sh" \
+      --fileName "app/etc/env.php"
+  fi
+
+  fileStatus=$("${currentPath}/../core/script/run-quiet.sh" "webServer:single" "${currentPath}/../ops/create-shared/web-server-check.sh" \
+    --fileName "app/etc/config.php")
+
+  if [[ "${fileStatus}" == "mounted" ]]; then
+    echo "app/etc/config.php is mounted"
+  else
+    "${currentPath}/../core/script/run.sh" "webServer:all" "${currentPath}/../ops/create-shared/web-server.sh" \
+      --fileName "app/etc/config.php" \
+      --overwrite
+    "${currentPath}/../core/script/run.sh" "webServer:all,env:local" "${currentPath}/../ops/create-shared/web-server-env.sh" \
+      --fileName "app/etc/config.php"
+  fi
 
   if [[ -n "${environmentSetup}" ]]; then
-    "${currentPath}/../core/script/web-server/all.sh" "${currentPath}/../ops/create-shared/web-server.sh" \
-      -f "app/etc/env/base.php" \
-      -o
-    "${currentPath}/../core/script/env/web-servers.sh" "${currentPath}/../ops/create-shared/env-web-server.sh" \
-      -f "app/etc/env/base.php"
+    fileStatus=$("${currentPath}/../core/script/run-quiet.sh" "webServer:single" "${currentPath}/../ops/create-shared/web-server-check.sh" \
+      --fileName "app/etc/env/base.php")
+
+    if [[ "${fileStatus}" == "mounted" ]]; then
+      echo "app/etc/env/base.php is mounted"
+    else
+      "${currentPath}/../core/script/run.sh" "webServer:all" "${currentPath}/../ops/create-shared/web-server.sh" \
+        --fileName "app/etc/env/base.php" \
+        --overwrite
+      "${currentPath}/../core/script/run.sh" "webServer:all,env:local" "${currentPath}/../ops/create-shared/web-server-env.sh" \
+        --fileName "app/etc/env/base.php"
+    fi
+
+    fileStatus=$("${currentPath}/../core/script/run-quiet.sh" "webServer:single" "${currentPath}/../ops/create-shared/web-server-check.sh" \
+      --fileName "app/etc/env/${environmentSetup}.php")
+
+    if [[ "${fileStatus}" == "mounted" ]]; then
+      echo "app/etc/env/${environmentSetup}.php is mounted"
+    else
+      "${currentPath}/../core/script/run.sh" "webServer:all" "${currentPath}/../ops/create-shared/web-server.sh" \
+        --fileName "app/etc/env/${environmentSetup}.php" \
+        --overwrite
+      "${currentPath}/../core/script/run.sh" "webServer:all,env:local" "${currentPath}/../ops/create-shared/web-server-env.sh" \
+        --fileName "app/etc/env/${environmentSetup}.php"
+    fi
 
     ini-set "${currentPath}/../env.properties" yes system environment "${environmentSetup}"
   fi
